@@ -1,3 +1,5 @@
-Simple points bot for Discord written in Node.js.
-!points add/remove <user> <amt> <reason>
-!points scoreboard
+#Simple points bot for Discord using [Discord.js](https://github.com/discordjs/discord.js/).
+
+**Commands**
+- *!points add/remove <user> <amt> <reason>*
+- *!points scoreboard*
