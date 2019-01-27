@@ -3,3 +3,7 @@
 **Commands**
 - *!points add/remove <user> <amt> <reason>*
 - *!points scoreboard*
+- *!points log <user>*
+
+**How to use**
+- 
