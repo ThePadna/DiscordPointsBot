@@ -2,11 +2,15 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const fs = require('fs');
 const USER_DIR = "\\users\\";
-const CMD_HELP_ALL = "Commands: !points give <usr> <pts> <reason> | !points scoreboard | !points log <usr>", UNKNOWN_CMD = "Unknown Command", TOO_FEW_ARGS = "Too few arguments",
-POINTS_LOG_PREFIX = "\n**====================[ %user%'s Points Log " + "]====================**\n";
+const CMD_HELP_ALL = "Commands: !points give <usr> <pts> <reason> | !points scoreboard | !points log <usr>", 
+UNKNOWN_CMD = "Unknown Command", 
+TOO_FEW_ARGS = "Too few arguments",
+POINTS_LOG_PREFIX = "\n**====================[ %user%'s Points: %pts% " + "]====================**\n", 
+SCOREBOARD_PREFIX = "\n**====================[ Points Scoreboard ]====================**\n";
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  console.log("num: " + (-1 + 5));
 });
 
 fs.readFile(__dirname + "/auth.txt", function(err, buff) {
@@ -47,7 +51,6 @@ client.on('message', msg => {
 				return;
 			}
 			var points = contents[3];
-			msg.reply("ptsArg:" + points);
 			/* shift first 4 args */
 			var SHIFT_ARGS = 3;
 			for(var i = 0; i <= SHIFT_ARGS; i++) {
@@ -55,7 +58,45 @@ client.on('message', msg => {
 			}
 			addPoint(tagged.get(tagged.firstKey()).tag, points, contents.join(" "));
 		} else if(equalsIgnoreCase(contents[1], "scoreboard")) {
-			//scoreboard code
+			msg.reply("Fetching data...");
+			var membersCollection = msg.guild.members;
+			var stringBuilder = SCOREBOARD_PREFIX;
+			var map = new Map();
+			membersCollection.forEach(function(member) {
+				filePath = __dirname + USER_DIR + member.user.tag + ".json";
+				if(!fs.existsSync(filePath)) {
+					msg.reply("doesn't exist :[");
+					return;
+				}
+				fs.readFile(filePath, 'utf8', function callback(err, data) {
+					if(err) {
+						console.log(err);
+					} else {
+						dataFromJSON = JSON.parse(data);
+						var total = 0;
+						for(var date in dataFromJSON) {
+							var pts = Number.parseInt(dataFromJSON[date].pts);
+							total += pts;
+						}
+						map.set(member.user.tag, total);
+					}
+				});
+			});
+			setTimeout(function callback() {
+				let sortMap = new Map([...map].sort(([user, pts], [user2, pts2]) => {
+					if(pts < pts2) {
+						return 1;
+					} else if(pts > pts2) {
+						return -1;
+					} else return 0;
+				}));
+				let place = 1;
+				sortMap.forEach(function callback(value, key) {
+					stringBuilder += (place + ". **" + key.substring(0, (key.length - 5)) + "** - " + value.toString() + "\n");
+					place++;
+				});
+				msg.reply(stringBuilder);
+			}, 1000);
 		} else if(equalsIgnoreCase(contents[1], "log")) {
 			if(typeof contents[2] === 'undefined') {
 				bundleMessages(msg, [TOO_FEW_ARGS, CMD_HELP_ALL]);
@@ -73,21 +114,24 @@ client.on('message', msg => {
 				return;
 			}
 			fs.readFile(filePath, 'utf8', function callback(err, data) {
-			if(err) {
-				console.log(err);
-			} else {
-				dataFromJSON = JSON.parse(data);
-				var prefix = POINTS_LOG_PREFIX.replace("%user%", username);
-				var stringBuilder = prefix;
-				for(var date in dataFromJSON) {
-					console.log(date);
-					var d = new Date(date);
-					stringBuilder += ( "*[" + d.toString() + "] Points: " + dataFromJSON[date].pts + " - Reason: " + dataFromJSON[date].reason + "*\n")
+				if(err) {
+					console.log(err);
+				} else {
+					dataFromJSON = JSON.parse(data);
+					var stringBuilder = POINTS_LOG_PREFIX;
+					var total = 0;
+					for(var date in dataFromJSON) {
+						var d = new Date(date);
+						var reason = dataFromJSON[date].reason, pts = Number.parseInt(dataFromJSON[date].pts);
+						total += pts;
+						stringBuilder += ( "*[" + d.toString() + "] Points: " + pts + " - Reason: " + reason + "*\n")
+					}
+					stringBuilder = stringBuilder.substr(0, (stringBuilder.length - 1)); //snip the break
+					stringBuilder = stringBuilder.replace(new RegExp("%user%", 'g'), username);
+					stringBuilder = stringBuilder.replace(new RegExp("%pts%", 'g'), total);
+					msg.reply(stringBuilder);
 				}
-				stringBuilder += prefix;
-				msg.reply(stringBuilder);
-			}
-		});
+			});
 		} else {
 			bundleMessages(msg, {UNKNOWN_CMD, CMD_HELP_ALL});
 		}
