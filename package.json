@@ -2,7 +2,7 @@
   "name": "DiscordPointsBot",
   "version": "1.0.0",
   "main": "DiscordPointsBot.js",
-  "description": "Discord bot to manage a points system written in node"
+  "description": "Discord bot to manage a points system written in node",
   "scripts": {
     "start": "node DiscordPointsBot.js"
 	}
