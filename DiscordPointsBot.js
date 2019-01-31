@@ -10,7 +10,6 @@ SCOREBOARD_PREFIX = "\n**====================[ Points Scoreboard ]==============
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  console.log("num: " + (-1 + 5));
 });
 
 fs.readFile(__dirname + "/auth.txt", function(err, buff) {
@@ -33,6 +32,7 @@ client.on('message', msg => {
 		msg.reply("debug1");
 	} else {
 		if(equalsIgnoreCase(contents[1], "give")) {
+			if(!msg.member.hasPermission("ADMINISTRATOR")) return;
 			var ARGS_CHECK_VALIDITY = 3;
 			for(var i = 0; i <= ARGS_CHECK_VALIDITY; i++) {
 				var arrayIndex = (i + 1), arg = contents[arrayIndex];
@@ -65,7 +65,6 @@ client.on('message', msg => {
 			membersCollection.forEach(function(member) {
 				filePath = __dirname + USER_DIR + member.user.tag + ".json";
 				if(!fs.existsSync(filePath)) {
-					msg.reply("doesn't exist :[");
 					return;
 				}
 				fs.readFile(filePath, 'utf8', function callback(err, data) {
@@ -150,6 +149,7 @@ function equalsIgnoreCase(a, b) {
 }
 
 function addPoint(username, amt, reason) {
+	console.log("calling");
 	var date = new Date();
 	filePath = __dirname + USER_DIR + username + ".json";
 	var passedData = {"pts":amt, "reason":reason};
