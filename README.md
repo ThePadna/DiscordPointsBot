@@ -1,9 +1,9 @@
 # Simple points bot for Discord using [Discord.js](https://github.com/discordjs/discord.js/). #
 
 **Commands**
-- **PERMISSION:ADMINISTRATOR** *!points add/remove <user> <amt> <reason>*
-- *!points scoreboard*
-- *!points log <user>*
+- **PERMISSION:ADMINISTRATOR** *!points add/remove <user> <amt> <reason>* - Add or remove points from a user.
+- *!points scoreboard* - Displays scoreboard of all users' points.
+- *!points log <user>* - Shows when and how a user was accredited points.
 
 **How to use**
 - *Download as zip and enter the folder*
