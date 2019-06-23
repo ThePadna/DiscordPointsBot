@@ -6,5 +6,6 @@
 - *!points log <user>*
 
 **How to use**
+- *Download as zip and enter the folder*
 - *Create auth.txt with your bot's token in the same directory*
 - *run it with 'npm start' in the directory of the bot, or 'node DiscordPointsBot.js'.
